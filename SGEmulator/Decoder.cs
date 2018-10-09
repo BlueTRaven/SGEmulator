@@ -6,13 +6,6 @@ using System.Threading.Tasks;
 
 namespace SGEmulator
 {
-	public enum Size
-	{
-		Byte = 0b00,
-		Word = 0b01,
-		Long = 0b10
-	}
-
 	public enum Opmode
 	{
 		DByte = 0b000,
@@ -50,6 +43,8 @@ namespace SGEmulator
 		private static Word68k instADDI = new Word68k(0b00000110_00000000);
 		private static Word68k maskADDQ = new Word68k(0b1111_000_1_00_000000);
 		private static Word68k instADDQ = new Word68k(0b0101_000_0_00_000000);
+		private static Word68k maskADDX = new Word68k(0b1111_000_1_00_11_0000);
+		private static Word68k instADDX = new Word68k(0b1101_000_1_00_00_0000);
 
 		public string output;
 
@@ -72,10 +67,6 @@ namespace SGEmulator
 
 			Program.cpu.SetWordAt(new Long68k(4), instruction);
 			Program.cpu.Registers[7] = new Long68k(32);
-			//cpu.Registers[0] = new Long68k(32);
-			//cpu.Registers[7] = new Long68k(8);
-
-			//DecodeInstruction(instruction);
 		}
 
 		public void DecodeInstruction(Word68k instruction)
@@ -100,6 +91,10 @@ namespace SGEmulator
 			{
 				InstructionADDQ(instruction);
 			}
+			else if ((ushort)(instABCD & maskADDX) == instADDX.w)
+			{
+				InstructionADDX(instruction);
+			}
 
 			Console.WriteLine("Output from {0} instruction: ", instructionName);
 
@@ -122,8 +117,8 @@ namespace SGEmulator
 			//do we output to the second register (true) or the first (false)
 			//only used for the ADD instruction, not ADDA
 
-			Byte68k reg1 = InstructionUtils.GetDestReg(instruction);
-			Byte68k reg2 = InstructionUtils.GetSourceReg(instruction);
+			Byte68k reg1 = InstructionUtils.GetSourceReg(instruction);
+			Byte68k reg2 = InstructionUtils.GetDestReg(instruction);
 
 			if (mode == Opmode.ALong || mode == Opmode.AWord)
 			{   //ADDA instruction
@@ -198,7 +193,7 @@ namespace SGEmulator
 					break;
 			}
 
-			Byte68k register = InstructionUtils.GetSourceReg(instruction);
+			Byte68k register = InstructionUtils.GetDestReg(instruction);
 
 			Program.cpu.Registers[register.b] = CPU.BitwiseAdd(add, Program.cpu.Registers[register.b], true, false);
 
@@ -218,10 +213,10 @@ namespace SGEmulator
 
 			bool isAR = false;
 
-			Byte68k register = InstructionUtils.GetDestReg(instruction);
+			Byte68k register = InstructionUtils.GetSourceReg(instruction);
 			if (!isAR)
 			{
-				switch ((Size)size.w)
+				switch (InstructionUtils.GetSize(instruction))
 				{
 					case Size.Byte:
 						Program.cpu.Registers[register.b] = new Long68k(CPU.BitwiseAdd(data, Program.cpu.Registers[register.b], true, false).b);
@@ -240,6 +235,27 @@ namespace SGEmulator
 			}
 
 			output = Program.cpu.Registers[register.b].ToString();
+		}
+
+		private void InstructionADDX(Word68k instruction)
+		{
+			Byte68k sourcereg = InstructionUtils.GetSourceReg(instruction);
+			Byte68k destreg = InstructionUtils.GetDestReg(instruction);
+
+			switch (InstructionUtils.GetSize(instruction))
+			{
+				case Size.Byte:
+					Program.cpu.Registers[destreg.b] = new Long68k(CPU.BitwiseAdd(Program.cpu.Registers[sourcereg.b], (Byte68k)Program.cpu.Registers[destreg.b], true, true).b);
+					break;
+				case Size.Word:
+					Program.cpu.Registers[destreg.b] = new Long68k(CPU.BitwiseAdd(Program.cpu.Registers[sourcereg.b], (Word68k)Program.cpu.Registers[destreg.b], true, true).w);
+					break;
+				case Size.Long:
+					Program.cpu.Registers[destreg.b] = CPU.BitwiseAdd(Program.cpu.Registers[sourcereg.b], (Long68k)Program.cpu.Registers[destreg.b], true, true);
+					break;
+			}
+
+			output = Program.cpu.Registers[destreg.b].ToString();
 		}
 	}
 }

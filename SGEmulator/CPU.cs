@@ -194,7 +194,10 @@ namespace SGEmulator
 			}
 
 			if (addXbit)
+			{
 				output = BitwiseAdd(output, new Byte68k(1), signed, false);
+				Program.cpu.ExtendFlag = false;
+			}
 
 			if (carry == 1)                 //leftover carry
 				Program.cpu.CarryFlag = true;
@@ -236,7 +239,11 @@ namespace SGEmulator
 			}
 
 			if (addXbit)
+			{
 				output = BitwiseAdd(output, new Word68k(1), signed, false);
+				Program.cpu.ExtendFlag = false;
+
+			}
 
 			if (carry == 1)                 //leftover carry
 				Program.cpu.CarryFlag = true;
@@ -278,7 +285,10 @@ namespace SGEmulator
 			}
 
 			if (addXbit)
+			{
 				output = BitwiseAdd(output, new Long68k(1), signed, false);
+				Program.cpu.ExtendFlag = false;
+			}
 
 			if (carry == 1)                 //leftover carry
 				Program.cpu.CarryFlag = true;
