@@ -60,6 +60,7 @@ namespace SGEmulator
 		{
 			//Word68k addInst = new Word68k(0b1101_111_101_000_000);
 			Word68k instruction = new Word68k(0b00000110_10_000_111);
+
 			Word68k lowWord = new Word68k(0b0000_1111_1111_1111);
 			Word68k highWord = new Word68k(0b1111);
 

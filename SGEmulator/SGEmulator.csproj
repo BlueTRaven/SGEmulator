@@ -55,8 +55,10 @@
     <Compile Include="CmdCommands\CmdPrintReg.cs" />
     <Compile Include="CmdCommands\CmdQuit.cs" />
     <Compile Include="CmdCommands\CmdRun.cs" />
+    <Compile Include="CmdCommands\CmdRunTimes.cs" />
     <Compile Include="CmdCommands\CmdSetAReg.cs" />
     <Compile Include="CmdCommands\CmdSetReg.cs" />
+    <Compile Include="CmdCommands\CmdRunOnce.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="EmMain.cs" />
     <Compile Include="InstructionUtils.cs" />

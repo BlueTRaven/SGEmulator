@@ -25,6 +25,7 @@ namespace SGEmulator
 		public static Dictionary<string, CmdCommand> commands;
 
 		private static ProgramState currentState = ProgramState.CommandLine;
+		public static int emulateTimes = -1;		//run in emulation state for this many instructions, then return to command line state
 
 		static void Main(string[] args)
 		{
@@ -46,6 +47,16 @@ namespace SGEmulator
 				else if (currentState == ProgramState.Emulate)
 				{
 					cpu.ReadNextInstruction();
+
+					if (emulateTimes != -1)
+					{
+						emulateTimes--;
+						if (emulateTimes == 0)
+						{
+							ChangeState(ProgramState.CommandLine);
+							emulateTimes = -1;
+						}
+					}
 				}
 			}
 		}
@@ -53,6 +64,7 @@ namespace SGEmulator
 		public static void ChangeState(ProgramState state)
 		{
 			currentState = state;
+			Console.WriteLine("Changing to " + state.ToString() + " state.");
 		}
 
 		private static void InterpretConsole(string consoleIn)
