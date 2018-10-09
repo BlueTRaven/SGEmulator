@@ -17,8 +17,8 @@ namespace SGEmulator.CmdCommands
 			for (int i = 0; i < 8; i++)
 			{
 				if (i == 7)
-					Console.WriteLine("Stack Pointer: " + Program.decoder.cpu.ARegisters[i]);
-				else Console.WriteLine(Program.decoder.cpu.ARegisters[i]);
+					Console.WriteLine("Stack Pointer: " + Program.cpu.ARegisters[i]);
+				else Console.WriteLine(Program.cpu.ARegisters[i]);
 			}
 		}
 

@@ -18,21 +18,21 @@ namespace SGEmulator.CmdCommands
 
 			for (int i = 0; i < 8; i++)
 			{
-				Long68k address = Program.decoder.cpu.ARegisters[i];
+				Long68k address = Program.cpu.ARegisters[i];
 
 				switch (size)
 				{
 					case "byte":
 					case "b":
-						Console.WriteLine(Program.decoder.cpu.GetByteAt(address));
+						Console.WriteLine(Program.cpu.GetByteAt(address));
 						break;
 					case "word":
 					case "w":
-						Console.WriteLine(Program.decoder.cpu.GetWordAt(address));
+						Console.WriteLine(Program.cpu.GetWordAt(address));
 						break;
 					case "long":
 					case "l":
-						Console.WriteLine(Program.decoder.cpu.GetLongAt(address));
+						Console.WriteLine(Program.cpu.GetLongAt(address));
 						break;
 				}
 			}

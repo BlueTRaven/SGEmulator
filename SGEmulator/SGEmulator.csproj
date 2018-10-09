@@ -46,6 +46,7 @@
     <Compile Include="CmdCommands\CmdCommand.cs" />
     <Compile Include="CmdCommands\CmdCommandHelper.cs" />
     <Compile Include="CmdCommands\CmdDecodeInst.cs" />
+    <Compile Include="CmdCommands\CmdDump.cs" />
     <Compile Include="CmdCommands\CmdGetAReg.cs" />
     <Compile Include="CmdCommands\CmdGetReg.cs" />
     <Compile Include="CmdCommands\CmdHelp.cs" />
@@ -53,12 +54,13 @@
     <Compile Include="CmdCommands\CmdPrintPAReg.cs" />
     <Compile Include="CmdCommands\CmdPrintReg.cs" />
     <Compile Include="CmdCommands\CmdQuit.cs" />
+    <Compile Include="CmdCommands\CmdRun.cs" />
     <Compile Include="CmdCommands\CmdSetAReg.cs" />
     <Compile Include="CmdCommands\CmdSetReg.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="EmMain.cs" />
     <Compile Include="InstructionUtils.cs" />
-    <Compile Include="M68kDecoder.cs" />
+    <Compile Include="Decoder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types.cs" />

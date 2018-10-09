@@ -20,7 +20,7 @@ namespace SGEmulator.CmdCommands
 			{
 				string param2 = parameters[1].ToLower();
 
-				Program.decoder.cpu.ARegisters[register] = (Long68k)CmdCommandHelper.ParamToWord(param2);
+				Program.cpu.ARegisters[register] = (Long68k)CmdCommandHelper.ParamToWord(param2);
 
 				Console.WriteLine("Set address register {0} to {1}.", register, param2);
 			}

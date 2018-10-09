@@ -10,14 +10,22 @@ using System.Threading.Tasks;
 
 namespace SGEmulator
 {
-	class Program
+	public enum ProgramState
+	{
+		CommandLine,	//command line emulation
+		Emulate		//emulate cpu completely
+	}
+
+	public class Program
 	{
 		public static bool quit;
 		public static Decoder decoder;
 		public static CPU cpu;
 
 		public static Dictionary<string, CmdCommand> commands;
-		
+
+		private static ProgramState currentState = ProgramState.CommandLine;
+
 		static void Main(string[] args)
 		{
 			commands = new Dictionary<string, CmdCommand>();
@@ -29,10 +37,22 @@ namespace SGEmulator
 
 			while (!quit)
 			{
-				string input = Console.ReadLine();
+				if (currentState == ProgramState.CommandLine)
+				{
+					string input = Console.ReadLine();
 
-				InterpretConsole(input);
+					InterpretConsole(input);
+				}
+				else if (currentState == ProgramState.Emulate)
+				{
+					cpu.ReadNextInstruction();
+				}
 			}
+		}
+
+		public static void ChangeState(ProgramState state)
+		{
+			currentState = state;
 		}
 
 		private static void InterpretConsole(string consoleIn)

@@ -94,6 +94,7 @@ namespace SGEmulator
 		public Long68k ProgramCounter { get; private set; }
 
 		private byte[] memory;
+		public const int maxMemory = 72000;
 
 		public CPU(Long68k startOffset, bool trace, bool supervisor, byte interruptPriority)
 		{
@@ -107,7 +108,7 @@ namespace SGEmulator
 			Registers = new Long68k[8];
 			ARegisters = new Long68k[8];
 
-			memory = new byte[72000];
+			memory = new byte[maxMemory];
 		}
 
 		public void ReadNextInstruction()
@@ -118,7 +119,9 @@ namespace SGEmulator
 
 			Program.decoder.DecodeInstruction(GetWordAt(ProgramCounter));
 
-			ProgramCounter = BitwiseAdd(ProgramCounter, (Long68k)Program.decoder.instructionLength, false, false, false);
+			Long68k instLength = (Long68k)Program.decoder.instructionLength;
+
+			ProgramCounter = BitwiseAdd(ProgramCounter, instLength, false, false, false);
 		}
 
 		#region Get And Set Addresses
@@ -308,5 +311,10 @@ namespace SGEmulator
 			return output;
 		}
 		#endregion
+
+		public byte[] GetAllMemory()
+		{
+			return memory;
+		}
 	}
 }

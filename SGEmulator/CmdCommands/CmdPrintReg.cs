@@ -16,7 +16,7 @@ namespace SGEmulator.CmdCommands
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				Console.WriteLine(Program.decoder.cpu.Registers[i]);
+				Console.WriteLine(Program.cpu.Registers[i]);
 			}
 		}
 

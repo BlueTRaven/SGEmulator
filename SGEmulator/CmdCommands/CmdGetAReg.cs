@@ -19,7 +19,7 @@ namespace SGEmulator.CmdCommands
 
 			if (register < 8 && register >= 0)
 			{
-				Long68k registerContents = Program.decoder.cpu.ARegisters[register];
+				Long68k registerContents = Program.cpu.ARegisters[register];
 
 				Console.WriteLine("Contents of address register {0} are: {1}.", register, registerContents);
 			}

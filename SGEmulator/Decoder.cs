@@ -53,7 +53,8 @@ namespace SGEmulator
 
 		public string output;
 
-		public Byte68k instructionLength;	//current instruction length in bits
+		public Byte68k instructionLength;   //current instruction length in bits
+		public string instructionName;
 
 		public Decoder()
 		{
@@ -96,11 +97,13 @@ namespace SGEmulator
 
 		private void InstructionABCD(Word68k instruction)
 		{
+			instructionName = "ABCD";
 			instructionLength = new Byte68k(16);
 		}
 
 		private void InstructionADD(Word68k instruction)
 		{
+			instructionName = "ADD";
 			instructionLength = new Byte68k(16);
 			Opmode mode = InstructionUtils.GetOpmodeFrom(instruction);
 
@@ -112,13 +115,15 @@ namespace SGEmulator
 			Byte68k reg2 = InstructionUtils.GetSourceReg(instruction);
 
 			if (mode == Opmode.ALong || mode == Opmode.AWord)
-			{	//ADDA instruction
+			{   //ADDA instruction
+				instructionName = "ADDA";
+
 				if (mode == Opmode.ALong)
 				{
 					Long68k a = Program.cpu.GetLongAt(Program.cpu.ARegisters[reg1.b]);
 					Long68k b = Program.cpu.GetLongAt(Program.cpu.ARegisters[reg2.b]);
 
-					Program.cpu.SetLongAt(Program.cpu.ARegisters[reg1.b], BitwiseAdd(a, b, true, false));
+					Program.cpu.SetLongAt(Program.cpu.ARegisters[reg1.b], CPU.BitwiseAdd(a, b, true, false));
 
 					output = Program.cpu.ARegisters[reg1.b].ToString();
 				}
@@ -127,7 +132,7 @@ namespace SGEmulator
 					Word68k a = Program.cpu.GetWordAt(Program.cpu.ARegisters[reg1.b]);
 					Word68k b = Program.cpu.GetWordAt(Program.cpu.ARegisters[reg2.b]);
 
-					Program.cpu.SetWordAt(Program.cpu.ARegisters[reg1.b], BitwiseAdd(a, b, true, false));
+					Program.cpu.SetWordAt(Program.cpu.ARegisters[reg1.b], CPU.BitwiseAdd(a, b, true, false));
 
 					output = Program.cpu.ARegisters[reg1.b].ToString();
 				}
@@ -136,14 +141,14 @@ namespace SGEmulator
 			{	//ADD instruction
 				if (!reverse)
 				{
-					Program.cpu.Registers[reg1.b] = BitwiseAdd(Program.cpu.Registers[reg2.b], Program.cpu.Registers[reg1.b], true, false);
+					Program.cpu.Registers[reg1.b] = CPU.BitwiseAdd(Program.cpu.Registers[reg2.b], Program.cpu.Registers[reg1.b], true, false);
 					//cpu.Registers[reg1.b] = cpu.Registers[reg2.b] + cpu.Registers[reg1.b];
 
 					output = Program.cpu.Registers[reg1.b].ToString();
 				}
 				else
 				{
-					Program.cpu.Registers[reg2.b] = BitwiseAdd(Program.cpu.Registers[reg1.b], Program.cpu.Registers[reg2.b], true, false);
+					Program.cpu.Registers[reg2.b] = CPU.BitwiseAdd(Program.cpu.Registers[reg1.b], Program.cpu.Registers[reg2.b], true, false);
 					//cpu.Registers[reg2.b] = cpu.Registers[reg1.b] + cpu.Registers[reg2.b];
 
 					output = Program.cpu.Registers[reg2.b].ToString();
@@ -153,6 +158,7 @@ namespace SGEmulator
 
 		private void InstructionADDI(Word68k instruction)
 		{
+			instructionName = "ADDI";
 			Word68k a = Program.cpu.GetWordAt(CPU.BitwiseAdd(Program.cpu.ProgramCounter, new Long68k(2), false, false, false)); //get the next word after the instruction
 			Word68k b = Program.cpu.GetWordAt(CPU.BitwiseAdd(Program.cpu.ProgramCounter, new Long68k(4), false, false, false)); //get the next word after that
 			//note that if we're using a byte or word b will be junk data
