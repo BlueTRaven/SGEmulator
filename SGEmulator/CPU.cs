@@ -87,8 +87,8 @@ namespace SGEmulator
 		#endregion
 
 		public Word68k StatusRegister { get; private set; }
-		public Long68k[] Registers { get; set; }
-		public Long68k[] ARegisters { get; set; }
+		private Long68k[] Registers { get; set; }
+		private Long68k[] ARegisters { get; set; }
 		public Long68k Stack { get { return ARegisters[7]; } set { ARegisters[7] = value; } }
 
 		public Long68k ProgramCounter { get; private set; }
@@ -119,53 +119,157 @@ namespace SGEmulator
 			//Read instruction from offset. Store its length.
 			//Increase program counter by instruction length.
 
-			Program.decoder.DecodeInstruction(GetWordAt(ProgramCounter));
+			Program.decoder.DecodeInstruction(GetMemWord(ProgramCounter));
 
 			Long68k instLength = (Long68k)Program.decoder.instructionLength;
 
 			ProgramCounter = BitwiseAdd(ProgramCounter, instLength, false, false, false);
 		}
 
-		#region Get And Set Addresses
-		public Byte68k GetByteAt(Long68k address)
+        #region Get And Set Registers
+        /// <summary>
+        /// Gets the low order byte in the given register.
+        /// </summary>
+        /// <param name="addressReg">If true, indexes into an address register instead of a data register.
+        /// Note that is the contents of the register, not the contents that the register points to.</param>
+        public Byte68k GetRegByte(int register, bool addressReg)
+        {
+            Long68k mask = new Long68k(0xFF);
+
+            if (addressReg)
+                return new Byte68k(mask & ARegisters[register]);
+            else return new Byte68k(mask & Registers[register]);
+        }
+
+        /// <summary>
+        /// Gets the low order word in the given register.
+        /// </summary>
+        /// <param name="addressReg">If true, indexes into an address register instead of a data register.
+        /// Note that is the contents of the register, not the contents that the register points to.</param>
+        public Word68k GetRegWord(int register, bool addressReg)
+        {
+            Long68k mask = new Long68k(0xFFFF);
+
+            if (addressReg)
+                return new Word68k(mask & ARegisters[register]);
+            else return new Word68k(mask & Registers[register]);
+        }
+
+        /// <summary>
+        /// Gets the long in the given register.
+        /// </summary>
+        /// <param name="addressReg">If true, indexes into an address register instead of a data register.
+        /// Note that is the contents of the register, not the contents that the register points to.</param>
+        public Long68k GetRegLong(int register, bool addressReg)
+        {
+            if (addressReg)
+                return ARegisters[register];
+            else return Registers[register];
+        }
+
+        /// <summary>
+        /// Sets a byte in the given register index.
+        /// </summary>
+        /// <param name="addressReg">If true, indexes into an address register instead of data register. 
+        /// Note that this does not set the contents of memory that the register points to, just the pointer itself.</param>
+        /// <param name="overwrite">should the byte overwrite the entire contents of the data register. If false only the low order 8 bits are set.</param>
+        public void SetRegByte(Byte68k b, int register, bool addressReg, bool overwrite = false)
+        {
+            if (!overwrite)
+            {
+                Long68k content = new Long68k((Registers[register].l & 0xFF)) | (Long68k)b;
+
+                if (addressReg)
+                    ARegisters[register] = content;
+                else Registers[register] = content;
+            }
+            else
+            {
+                if (addressReg)
+                    ARegisters[register] = (Long68k)b;
+                else Registers[register] = (Long68k)b;
+            }
+        }
+
+        /// <summary>
+        /// Sets a word in the given data register index.
+        /// </summary>
+        /// <param name="addressReg">If true, indexes into an address register instead of data register. 
+        /// Note that this does not set the contents of memory that the register points to, just the pointer itself.</param>
+        /// <param name="overwrite">should the byte overwrite the entire contents of the data register. If false only the low order 16 bits are set.</param>
+        public void SetRegWord(Word68k w, int register, bool addressReg, bool overwrite = false)
+        {
+            if (!overwrite)
+            {
+                Long68k content = new Long68k((Registers[register].l & 0xFFFF)) | (Long68k)w;
+
+                if (addressReg)
+                    ARegisters[register] = content;
+                else Registers[register] = content;
+            }
+            else
+            {
+                if (addressReg)
+                    ARegisters[register] = (Long68k)w;
+                else Registers[register] = (Long68k)w;
+            }
+        }
+
+        /// <summary>
+        /// Sets a long in the given data register index.
+        /// Note that there is no overwrite parameter; data registers are a long in length, therefore
+        /// we must overwrite the entire contents.
+        /// <param name="addressReg">If true, indexes into an address register instead of data register. 
+        /// Note that this does not set the contents of memory that the register points to, just the pointer itself.</param>
+        /// </summary>
+        public void SetRegLong(Long68k l, int register, bool addressReg)
+        {
+            if (addressReg)
+                ARegisters[register] = l;
+            else Registers[register] = l;
+        }
+        #endregion
+
+        #region Get And Set Memory
+        public Byte68k GetMemByte(Long68k address)
 		{
 			return new Byte68k(memory[address.l]);
 		}
 
-		public void SetByteAt(Long68k address, Byte68k value)
+		public void SetMemByte(Long68k address, Byte68k value)
 		{
 			memory[address.l] = value.b;
 		}
 
-		public Word68k GetWordAt(Long68k address)
+		public Word68k GetMemWord(Long68k address)
 		{
 			return new Word68k(BitConverter.ToUInt16(memory, (int)address.l));
 		}
 
-		public void SetWordAt(Long68k address, Word68k value)
+		public void SetMemWord(Long68k address, Word68k value)
 		{
 			byte[] bytes = new byte[2];
 
 			bytes = BitConverter.GetBytes(value.w);
 
-			SetMemory(address, bytes);
+			SetMemBytes(address, bytes);
 		}
 
-		public Long68k GetLongAt(Long68k address)
+		public Long68k GetMemLong(Long68k address)
 		{
 			return new Long68k(BitConverter.ToUInt32(memory, (int)address.l));
 		}
 
-		public void SetLongAt(Long68k address, Long68k value)
+		public void SetMemLong(Long68k address, Long68k value)
 		{
 			byte[] bytes = new byte[4];
 
 			bytes = BitConverter.GetBytes(value.l);
 
-			SetMemory(address, bytes);
+			SetMemBytes(address, bytes);
 		}
 
-		public void SetMemory(Long68k address, byte[] bytes)
+		public void SetMemBytes(Long68k address, byte[] bytes)
 		{
 			for (int i = 0; i < bytes.Length; i++)
 			{

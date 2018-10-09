@@ -24,15 +24,15 @@ namespace SGEmulator.CmdCommands
 				{
 					case "byte":
 					case "b":
-						Console.WriteLine(Program.cpu.GetByteAt(address));
+						Console.WriteLine(Program.cpu.GetMemByte(address));
 						break;
 					case "word":
 					case "w":
-						Console.WriteLine(Program.cpu.GetWordAt(address));
+						Console.WriteLine(Program.cpu.GetMemWord(address));
 						break;
 					case "long":
 					case "l":
-						Console.WriteLine(Program.cpu.GetLongAt(address));
+						Console.WriteLine(Program.cpu.GetMemLong(address));
 						break;
 				}
 			}
