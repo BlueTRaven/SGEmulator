@@ -113,6 +113,8 @@ namespace SGEmulator
 
 		public void ReadNextInstruction()
 		{
+			Console.WriteLine("Running next instruction at offset " + ProgramCounter + ".");
+
 			//PC = our current instruction offset.
 			//Read instruction from offset. Store its length.
 			//Increase program counter by instruction length.
@@ -137,11 +139,7 @@ namespace SGEmulator
 
 		public Word68k GetWordAt(Long68k address)
 		{
-			byte b1 = memory[address.l];
-			byte b2 = memory[address.l + 1];
-
-			Word68k combined = new Word68k((ushort)((b1 << 8) | b2));
-			return combined;
+			return new Word68k(BitConverter.ToUInt16(memory, (int)address.l));
 		}
 
 		public void SetWordAt(Long68k address, Word68k value)
@@ -155,15 +153,7 @@ namespace SGEmulator
 
 		public Long68k GetLongAt(Long68k address)
 		{
-			byte[] bytes = new byte[4];
-
-			for (int i = 0; i < bytes.Length; i++)
-			{
-				bytes[i] = memory[address.l + i];
-			}
-
-			Long68k combined = new Long68k(BitConverter.ToUInt32(bytes, 0));
-			return combined;
+			return new Long68k(BitConverter.ToUInt32(memory, (int)address.l));
 		}
 
 		public void SetLongAt(Long68k address, Long68k value)

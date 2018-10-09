@@ -59,20 +59,29 @@ namespace SGEmulator
 		public Decoder()
 		{
 			//Word68k addInst = new Word68k(0b1101_111_101_000_000);
-			Word68k instruction = new Word68k(0b00000110_10_000_111);
+			Word68k instruction = new Word68k(0b00000110_01_000_111);
 
-			Word68k lowWord = new Word68k(0b0000_1111_1111_1111);
-			Word68k highWord = new Word68k(0b1111);
+			Word68k lowWord = new Word68k(16);
+			Word68k highWord = new Word68k();
 
+			Program.cpu.SetWordAt(new Long68k(0), instruction);
+			Program.cpu.SetWordAt(new Long68k(2), lowWord);
+			//Program.cpu.SetWordAt(new Long68k(4), highWord);
+
+			instruction = new Word68k(0b0101_111_0_10_000_111);
+
+			Program.cpu.SetWordAt(new Long68k(4), instruction);
+			Program.cpu.Registers[7] = new Long68k(32);
 			//cpu.Registers[0] = new Long68k(32);
 			//cpu.Registers[7] = new Long68k(8);
 
-			DecodeInstruction(instruction);
+			//DecodeInstruction(instruction);
 		}
 
 		public void DecodeInstruction(Word68k instruction)
 		{
 			instructionLength = new Byte68k(0);
+			instructionName = "no instruction";
 			output = "no instruction";
 
 			if ((ushort)(instruction & maskABCD) == instABCD.w)
@@ -92,9 +101,10 @@ namespace SGEmulator
 				InstructionADDQ(instruction);
 			}
 
+			Console.WriteLine("Output from {0} instruction: ", instructionName);
+
 			Console.WriteLine(output);
 		}
-
 
 		private void InstructionABCD(Word68k instruction)
 		{
@@ -197,9 +207,10 @@ namespace SGEmulator
 
 		private void InstructionADDQ(Word68k instruction)
 		{   //get immediate data
-			instructionLength = new Byte68k(16);
+			instructionName = "ADDQ";
+			instructionLength = new Byte68k(2);
 
-			Word68k data = (instruction & new Word68k(0b0000_111_000000000)) >> 9;
+			Byte68k data = new Byte68k((instruction & new Word68k(0b0000_111_000000000)) >> 9);
 
 			Word68k sizemask = new Word68k(0b00000000_11_000000);
 
@@ -207,16 +218,19 @@ namespace SGEmulator
 
 			bool isAR = false;
 
+			Byte68k register = InstructionUtils.GetDestReg(instruction);
 			if (!isAR)
 			{
 				switch ((Size)size.w)
 				{
 					case Size.Byte:
-
+						Program.cpu.Registers[register.b] = new Long68k(CPU.BitwiseAdd(data, Program.cpu.Registers[register.b], true, false).b);
 						break;
 					case Size.Word:
+						Program.cpu.Registers[register.b] = new Long68k(CPU.BitwiseAdd(new Word68k(data.b), Program.cpu.Registers[register.b], true, false).w);
 						break;
 					case Size.Long:
+						Program.cpu.Registers[register.b] = new Long68k(CPU.BitwiseAdd(new Long68k(data.b), Program.cpu.Registers[register.b], true, false).l);
 						break;
 				}
 			}
@@ -224,6 +238,8 @@ namespace SGEmulator
 			{	//byte operations are not allowed with address register operations
 
 			}
+
+			output = Program.cpu.Registers[register.b].ToString();
 		}
 	}
 }

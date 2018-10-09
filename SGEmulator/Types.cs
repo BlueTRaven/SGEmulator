@@ -278,6 +278,13 @@ namespace SGEmulator
 			return new Byte68k((byte)(l.l | firstbytemask));
 		}
 
+		public static implicit operator Word68k(Long68k l)
+		{
+			Word68k wordMask = new Word68k(0b1111111111111111);
+
+			return new Word68k((ushort)(l.l | wordMask.w));
+		}
+
 		public static explicit operator uint(Long68k l)
 		{
 			return l.l;
